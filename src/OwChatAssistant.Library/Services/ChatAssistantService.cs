@@ -2,6 +2,7 @@
 using OwChatAssistant.Library.Interfaces;
 using OwChatAssistant.Library.Models;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace OwChatAssistant.Library.Services
 {
@@ -11,6 +12,7 @@ namespace OwChatAssistant.Library.Services
         private readonly ToxicityAnalyzerService toxicityAnalyzerService;
         private readonly IOverlayForm overlay;
         private readonly ProcessWatcher? serviceWatcher;
+        private readonly Configuration? config;
         public ChatAssistantService(IOverlayForm overlay)
         {
             this.overlay = overlay;
@@ -19,9 +21,13 @@ namespace OwChatAssistant.Library.Services
             {
                 throw new ProgramException("Configuration file is empty or missing.");
             }
-            var config = JsonSerializer.Deserialize<Configuration>(configText, new JsonSerializerOptions()
+            config = JsonSerializer.Deserialize<Configuration>(configText, new JsonSerializerOptions()
             {
-                PropertyNameCaseInsensitive = true
+                PropertyNameCaseInsensitive = true,
+                Converters =
+                {
+                    new JsonStringEnumConverter()
+                }
             });
             if (config == null)
             {
@@ -31,7 +37,7 @@ namespace OwChatAssistant.Library.Services
             toxicityAnalyzerService = new ToxicityAnalyzerService(new ToxicWords(config));
             AttachEvents();
             //serviceWatcher = new ProcessWatcher();
-            
+
         }
 
         public void Start()
@@ -39,7 +45,7 @@ namespace OwChatAssistant.Library.Services
             KeyboardHookService.Start();
             overlay.ShowToast(translations.GetTranslation("ServiceStarted"), MessageType.Info);
         }
-        
+
         public void Stop()
         {
             KeyboardHookService.Stop();
@@ -57,8 +63,19 @@ namespace OwChatAssistant.Library.Services
             if (isToxic)
             {
                 Logger.Log("Blocked toxic message: " + message);
-
-                overlay.ShowToast(translations.GetTranslation("MessageBlocked"), MessageType.Warning);
+                switch (config?.ToxicityBehavior)
+                {
+                    case ToxicityBehavior.Warn:
+                        isToxic=false;
+                        overlay.ShowToast(translations.GetTranslation("ToxicMessage"), MessageType.Warning);
+                        break;
+                    case ToxicityBehavior.Block:
+                        overlay.ShowToast(translations.GetTranslation("MessageBlocked"), MessageType.Error);
+                        break;
+                    
+                    case ToxicityBehavior.BlockSilent:
+                        break;
+                }
             }
             return !isToxic;
         }

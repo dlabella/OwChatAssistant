@@ -1,5 +1,6 @@
 {
   "defaultLanguage": "en",
+  "toxicityBehavior": "block",
   "translations": {
     "MessageBlocked": {
       "en": "Message blocked",
@@ -12,6 +13,10 @@
     "ServiceStopped": {
       "en": "Assistant stopped",
       "es": "Assistente detenido"
+    },
+    "ToxicMessage": {
+      "en": "Your message was flagged as toxic",
+      "es": "Tu mensaje fue marcado como tóxico"
     }
   },
   "toxicWords": {

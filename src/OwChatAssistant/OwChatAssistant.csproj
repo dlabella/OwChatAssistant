@@ -11,6 +11,7 @@
     <TrimMode>partial</TrimMode>
     <PublishReadyToRun>true</PublishReadyToRun>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <ApplicationIcon>Assets\Icons\app.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>

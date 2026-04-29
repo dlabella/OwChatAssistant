@@ -39,6 +39,7 @@ TargetRefPath=<PATH>obj/Debug/net10.0-windows/win-x64/ref/OwChatAssistant.dll
 /target:winexe
 /warnaserror-
 /utf8output
+/win32icon:Assets\Icons\app.ico
 /deterministic+
 /langversion:14.0
 /warnaserror+:NU1605,SYSLIB0011
