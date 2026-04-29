@@ -1,4 +1,5 @@
-﻿namespace OwChatAssistant.Library.Models
+﻿using OwChatAssistant.Library.Extensions;
+namespace OwChatAssistant.Library.Models
 {
     public class ToxicWords(Configuration configuration)
     {
@@ -6,10 +7,9 @@
         {
             foreach (var wordList in configuration.ToxicWords.Values)
             {
-                
                 foreach (var word in wordList)
                 {
-                    yield return word;
+                    yield return word.RemoveDiacritics().ToLower();
                 }
             }
         }

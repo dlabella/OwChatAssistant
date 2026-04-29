@@ -13,8 +13,19 @@ primary
 lastDtbSucceeded
 
 [properties]
+AssemblyName=OwChatAssistant
+CommandLineArgsForDesignTimeEvaluation=-langversion:14.0 -define:TRACE
+CompilerGeneratedFilesOutputPath=
+MaxSupportedLangVersion=14.0
+ProjectAssetsFile=<PATH>obj/project.assets.json
+RootNamespace=OwChatAssistant
+RunAnalyzers=
+RunAnalyzersDuringLiveAnalysis=
+SolutionPath=<PATH>../../OwChatAssistant.sln
+TargetFrameworkIdentifier=.NETCoreApp
 TargetPath=<PATH>bin/Debug/net10.0-windows/win-x64/OwChatAssistant.dll
 TargetRefPath=<PATH>obj/Debug/net10.0-windows/win-x64/ref/OwChatAssistant.dll
+TemporaryDependencyNodeTargetIdentifier=net10.0-windows
 
 [commandLineArguments]
 /noconfig

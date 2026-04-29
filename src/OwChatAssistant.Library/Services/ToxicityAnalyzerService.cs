@@ -1,4 +1,5 @@
-﻿using OwChatAssistant.Library.Models;
+﻿using OwChatAssistant.Library.Extensions;
+using OwChatAssistant.Library.Models;
 
 namespace OwChatAssistant.Library.Services
 {
@@ -8,7 +9,7 @@ namespace OwChatAssistant.Library.Services
 
         public bool IsToxic(string text)
         {
-            var textWords = text.Split(new[] { ' ', '\n', '\r', '\t', '.', ',', '!', '?', ';', ':', '-', '_', '(', ')', '[', ']', '{', '}', '"', '\'' }, StringSplitOptions.RemoveEmptyEntries);
+            var textWords = text.RemoveDiacritics().ToLower().Split(new[] { ' ', '\n', '\r', '\t', '.', ',', '!', '?', ';', ':', '-', '_', '(', ')', '[', ']', '{', '}', '"', '\'' }, StringSplitOptions.RemoveEmptyEntries);
             return words.Any(x => textWords.Contains(x, StringComparer.OrdinalIgnoreCase));
         }
     }
