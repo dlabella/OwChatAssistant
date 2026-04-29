@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace OwChatAssistant.Library;
+namespace OwChatAssistant.Library.Services;
 
 public static class CursorDetector
 {

@@ -10,7 +10,7 @@ namespace OwChatAssistant.Library.Services
         private readonly Translations translations;
         private readonly ToxicityAnalyzerService toxicityAnalyzerService;
         private readonly IOverlayForm overlay;
-        private readonly ProcessWatcher serviceWatcher;
+        private readonly ProcessWatcher? serviceWatcher;
         public ChatAssistantService(IOverlayForm overlay)
         {
             this.overlay = overlay;
@@ -29,24 +29,26 @@ namespace OwChatAssistant.Library.Services
             }
             translations = new Translations(config);
             toxicityAnalyzerService = new ToxicityAnalyzerService(new ToxicWords(config));
-            serviceWatcher = new ProcessWatcher();
+            AttachEvents();
+            //serviceWatcher = new ProcessWatcher();
+            
         }
+
         public void Start()
         {
-            serviceWatcher.OnStarted += () =>
-            {
-                KeyboardHookService.Start();
-                overlay.ShowToast(translations.GetTranslation("GameStarted"), MessageType.Info);
-            };
-            serviceWatcher.OnStopped += () =>
-            {
-                KeyboardHookService.Stop();
-                overlay.ShowToast(translations.GetTranslation("GameStopped"), MessageType.Info);
-            };
-            serviceWatcher.Start("overwatch.exe");
-            KeyboardHookService.OnChatMessage = AnalyzeChatMessage;
-
+            KeyboardHookService.Start();
             overlay.ShowToast(translations.GetTranslation("ServiceStarted"), MessageType.Info);
+        }
+        
+        public void Stop()
+        {
+            KeyboardHookService.Stop();
+            overlay.ShowToast(translations.GetTranslation("ServiceStopped"), MessageType.Info);
+        }
+
+        private void AttachEvents()
+        {
+            KeyboardHookService.OnChatMessage = AnalyzeChatMessage;
         }
 
         private bool AnalyzeChatMessage(string message)

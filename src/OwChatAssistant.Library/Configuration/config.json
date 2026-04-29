@@ -8,6 +8,10 @@
     "ServiceStarted": {
       "en": "Assistant started",
       "es": "Assistente iniciado"
+    },
+    "ServiceStopped": {
+      "en": "Assistant stopped",
+      "es": "Assistente detenido"
     }
   },
   "toxicWords": {
