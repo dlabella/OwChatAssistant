@@ -57,7 +57,7 @@ public static class KeyboardHookService
         if (key == Keys.Enter)
         {
             Logger.Log("Enter key pressed. Chat open: " + chatOpen);
-            chatOpen = !chatOpen;//CursorDetector.IsCursorVisible();
+            chatOpen = CursorDetector.IsCursorVisible();
             if (!chatOpen)
             {
                 string text = buffer.ToString();
@@ -74,7 +74,7 @@ public static class KeyboardHookService
 
         if (key == Keys.Escape && chatOpen)
         {
-            chatOpen = true;//CursorDetector.IsCursorVisible();
+            chatOpen = CursorDetector.IsCursorVisible();
             buffer.Clear();
             return CallNextHookEx(_hookID, nCode, wParam, lParam);
         }
