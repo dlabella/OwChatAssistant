@@ -1,0 +1,27 @@
+{
+  "defaultLanguage": "en",
+  "translations": {
+    "MessageBlocked": {
+      "en": "Message blocked",
+      "es": "Mensaje bloqueado"
+    },
+    "ServiceStarted": {
+      "en": "Assistant started",
+      "es": "Assistente iniciado"
+    }
+  },
+  "toxicWords": {
+    "en": [
+      "retard","shit"
+    ],
+    "es": [
+      "retrasado",
+      "mierda"
+    ],
+    "slang": [
+      "fq",
+      "fu",
+      "fuk"
+    ]
+  }
+}
