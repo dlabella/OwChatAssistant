@@ -17,22 +17,37 @@ jobs:
       with:
         dotnet-version: '10.0.x'
     
+    - name: Get version from tag
+      id: version
+      run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+    
     - name: Restore dependencies
       run: dotnet restore
     
     - name: Build
       run: dotnet build --configuration Release --no-restore
     
-    - name: Publish
-      run: dotnet publish --configuration Release --output ./publish
+    - name: Publish (Self-contained)
+      run: dotnet publish --configuration Release --output ./publish --self-contained -r win-x64 -p:PublishSingleFile=true
     
-    - name: Create Release
+    - name: Create ZIP archive
+      run: |
+        cd publish
+        7z a -r ../OwChatAssistant-${{ steps.version.outputs.VERSION }}.zip *
+        cd ..
+    
+    - name: Create GitHub Release
       uses: softprops/action-gh-release@v1
       with:
         files: |
-          publish/**/*.exe
-          publish/**/*.dll
+          OwChatAssistant-*.zip
         draft: false
         prerelease: false
+        body: |
+          ## OwChatAssistant ${{ steps.version.outputs.VERSION }}
+          
+          **Descarga y ejecuta el .exe**
+          
+          Compilado automáticamente con GitHub Actions (.NET 10)
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
