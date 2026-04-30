@@ -5,6 +5,10 @@ on:
     tags:
       - 'v*'
 
+permissions:
+  contents: write
+  packages: write
+
 jobs:
   build:
     runs-on: windows-latest
@@ -27,7 +31,7 @@ jobs:
     - name: Build
       run: dotnet build --configuration Release --no-restore
     
-    - name: Publish (Solo el proyecto ejecutable)
+    - name: Publish 
       run: dotnet publish ./src/OwChatAssistant/OwChatAssistant.csproj --configuration Release --output ./publish --self-contained -r win-x64 -p:PublishSingleFile=true
     
     - name: Create ZIP archive
