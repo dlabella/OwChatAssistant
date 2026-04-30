@@ -30,8 +30,10 @@ namespace OwChatAssistant
         {
             var config = ChatAssistantSettings.Load();
 
-            //if (config.System.DebugMode)
+            if (config.System.DebugMode)
+            {
                 EnableDebugConsole();
+            }
             Logger.Log("App Starting...");
 
             ApplicationConfiguration.Initialize();

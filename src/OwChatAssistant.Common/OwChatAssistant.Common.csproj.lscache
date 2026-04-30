@@ -13,19 +13,19 @@ primary
 lastDtbSucceeded
 
 [properties]
-AssemblyName=OwChatAssistant
+AssemblyName=OwChatAssistant.Common
 CommandLineArgsForDesignTimeEvaluation=-langversion:14.0 -define:TRACE
 CompilerGeneratedFilesOutputPath=
 MaxSupportedLangVersion=14.0
 ProjectAssetsFile=<PATH>obj/project.assets.json
-RootNamespace=OwChatAssistant
+RootNamespace=OwChatAssistant.Common
 RunAnalyzers=
 RunAnalyzersDuringLiveAnalysis=
 SolutionPath=<PATH>../../OwChatAssistant.sln
 TargetFrameworkIdentifier=.NETCoreApp
-TargetPath=<PATH>bin/Debug/net10.0-windows/win-x64/OwChatAssistant.dll
-TargetRefPath=<PATH>obj/Debug/net10.0-windows/win-x64/ref/OwChatAssistant.dll
-TemporaryDependencyNodeTargetIdentifier=net10.0-windows
+TargetPath=<PATH>bin/Debug/net10.0/OwChatAssistant.Common.dll
+TargetRefPath=<PATH>obj/Debug/net10.0/ref/OwChatAssistant.Common.dll
+TemporaryDependencyNodeTargetIdentifier=net10.0
 
 [commandLineArguments]
 /noconfig
@@ -34,10 +34,9 @@ TemporaryDependencyNodeTargetIdentifier=net10.0-windows
 /nowarn:1701,1702,1701,1702
 /fullpaths
 /nostdlib+
-/platform:x64
 /errorreport:prompt
 /warn:10
-/define:TRACE;DEBUG;NET;NET10_0;NETCOREAPP;WINDOWS;WINDOWS7_0;NET5_0_OR_GREATER;NET6_0_OR_GREATER;NET7_0_OR_GREATER;NET8_0_OR_GREATER;NET9_0_OR_GREATER;NET10_0_OR_GREATER;NETCOREAPP3_0_OR_GREATER;NETCOREAPP3_1_OR_GREATER;WINDOWS7_0_OR_GREATER
+/define:TRACE;DEBUG;NET;NET10_0;NETCOREAPP;NET5_0_OR_GREATER;NET6_0_OR_GREATER;NET7_0_OR_GREATER;NET8_0_OR_GREATER;NET9_0_OR_GREATER;NET10_0_OR_GREATER;NETCOREAPP1_0_OR_GREATER;NETCOREAPP1_1_OR_GREATER;NETCOREAPP2_0_OR_GREATER;NETCOREAPP2_1_OR_GREATER;NETCOREAPP2_2_OR_GREATER;NETCOREAPP3_0_OR_GREATER;NETCOREAPP3_1_OR_GREATER
 /highentropyva+
 /nullable:enable
 /features:"InterceptorsNamespaces=;Microsoft.Extensions.Validation.Generated"
@@ -45,31 +44,28 @@ TemporaryDependencyNodeTargetIdentifier=net10.0-windows
 /debug:portable
 /filealign:512
 /optimize-
-/out:obj\Debug\net10.0-windows\win-x64\OwChatAssistant.dll
-/refout:obj\Debug\net10.0-windows\win-x64\refint\OwChatAssistant.dll
-/target:winexe
+/out:obj\Debug\net10.0\OwChatAssistant.Common.dll
+/refout:obj\Debug\net10.0\refint\OwChatAssistant.Common.dll
+/target:library
 /warnaserror-
 /utf8output
-/win32icon:Assets\Icons\app.ico
 /deterministic+
 /langversion:14.0
 /warnaserror+:NU1605,SYSLIB0011
 
 [sourceFiles]
-obj/Debug/net10.0-windows/win-x64/
+Extensions/StringExtensions.cs
+Logger.cs
+obj/Debug/net10.0/
  .NETCoreApp,Version=v10.0.AssemblyAttributes.cs
- OwChatAssistant.AssemblyInfo.cs
- OwChatAssistant.GlobalUsings.g.cs
-Program.cs
+ OwChatAssistant.Common.AssemblyInfo.cs
+ OwChatAssistant.Common.GlobalUsings.g.cs
 
 [metadataReferences]
-../
- OwChatAssistant.Common/obj/Debug/net10.0/ref/OwChatAssistant.Common.dll
- OwChatAssistant.Configuration/obj/Debug/net10.0/ref/OwChatAssistant.Configuration.dll
- OwChatAssistant.Library/obj/Debug/net10.0-windows/ref/OwChatAssistant.Library.dll
 <DOTNET>/packs/Microsoft.NETCore.App.Ref/10.0.3/ref/net10.0/
  Microsoft.CSharp.dll
  Microsoft.VisualBasic.Core.dll
+ Microsoft.VisualBasic.dll
  Microsoft.Win32.Primitives.dll
  Microsoft.Win32.Registry.dll
  mscorlib.dll
@@ -104,6 +100,7 @@ Program.cs
  System.Diagnostics.TraceSource.dll
  System.Diagnostics.Tracing.dll
  System.dll
+ System.Drawing.dll
  System.Drawing.Primitives.dll
  System.Dynamic.Runtime.dll
  System.Formats.Asn1.dll
@@ -233,36 +230,6 @@ Program.cs
  System.Xml.XPath.dll
  System.Xml.XPath.XDocument.dll
  WindowsBase.dll
-<DOTNET>/packs/Microsoft.WindowsDesktop.App.Ref/10.0.3/ref/net10.0/
- Accessibility.dll
- Microsoft.VisualBasic.dll
- Microsoft.VisualBasic.Forms.dll
- Microsoft.Win32.Registry.AccessControl.dll
- Microsoft.Win32.SystemEvents.dll
- System.CodeDom.dll
- System.Configuration.ConfigurationManager.dll
- System.Design.dll
- System.Diagnostics.EventLog.dll
- System.Diagnostics.PerformanceCounter.dll
- System.DirectoryServices.dll
- System.Drawing.Common.dll
- System.Drawing.Design.dll
- System.Drawing.dll
- System.Formats.Nrbf.dll
- System.IO.Packaging.dll
- System.Private.Windows.Core.dll
- System.Private.Windows.GdiPlus.dll
- System.Resources.Extensions.dll
- System.Security.Cryptography.Pkcs.dll
- System.Security.Cryptography.ProtectedData.dll
- System.Security.Cryptography.Xml.dll
- System.Security.Permissions.dll
- System.Windows.Extensions.dll
- System.Windows.Forms.Design.dll
- System.Windows.Forms.Design.Editors.dll
- System.Windows.Forms.dll
- System.Windows.Forms.Primitives.dll
-<NUGET>/system.management/10.0.7/lib/net10.0/System.Management.dll
 
 [analyzerReferences]
 <DOTNET>/packs/Microsoft.NETCore.App.Ref/10.0.3/analyzers/dotnet/cs/
@@ -272,18 +239,10 @@ Program.cs
  Microsoft.Interop.SourceGeneration.dll
  System.Text.Json.SourceGeneration.dll
  System.Text.RegularExpressions.Generator.dll
-<DOTNET>/packs/Microsoft.WindowsDesktop.App.Ref/10.0.3/analyzers/dotnet/cs/
- System.Windows.Forms.Analyzers.CodeFixes.CSharp.dll
- System.Windows.Forms.Analyzers.CSharp.dll
-<DOTNET>/
- packs/Microsoft.WindowsDesktop.App.Ref/10.0.3/analyzers/dotnet/System.Windows.Forms.Analyzers.dll
- sdk/10.0.103/Sdks/Microsoft.NET.Sdk/analyzers/
-  Microsoft.CodeAnalysis.CSharp.NetAnalyzers.dll
-  Microsoft.CodeAnalysis.NetAnalyzers.dll
-<NUGET>/microsoft.net.illink.tasks/10.0.3/analyzers/dotnet/cs/
- ILLink.CodeFixProvider.dll
- ILLink.RoslynAnalyzer.dll
+<DOTNET>/sdk/10.0.103/Sdks/Microsoft.NET.Sdk/analyzers/
+ Microsoft.CodeAnalysis.CSharp.NetAnalyzers.dll
+ Microsoft.CodeAnalysis.NetAnalyzers.dll
 
 [analyzerConfigFiles]
 <DOTNET>/sdk/10.0.103/Sdks/Microsoft.NET.Sdk/analyzers/build/config/analysislevel_10_default.globalconfig
-obj/Debug/net10.0-windows/win-x64/OwChatAssistant.GeneratedMSBuildEditorConfig.editorconfig
+obj/Debug/net10.0/OwChatAssistant.Common.GeneratedMSBuildEditorConfig.editorconfig

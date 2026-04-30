@@ -31,6 +31,6 @@ public class CursorDetector : ICursorDetector
     public bool IsCursorVisible()
     {
         var info = new CursorInfo { cbSize = Marshal.SizeOf<CursorInfo>() };
-        return GetCursorInfo(ref info) && (info.flags & CURSOR_SHOWING) != 0;
+        return GetCursorInfo(ref info) && (info.flags & CURSOR_SHOWING) != 1;
     }
 }

@@ -6,7 +6,8 @@ namespace OwChatAssistant.Configuration
 {
     public class ChatAssistantSettings
     {
-        private const string ConfigPath = "Configuration/config.json";
+        private const string ConfigDirectory = "Configuration";
+        private const string ConfigFile = $"{ConfigDirectory}/config.json";
         private static readonly JsonSerializerOptions serializerOptions = new JsonSerializerOptions()
         {
             PropertyNameCaseInsensitive = true,
@@ -25,16 +26,17 @@ namespace OwChatAssistant.Configuration
             Logger.Log("Loading configuration");
             var configText = string.Empty;
             ChatAssistantSettings? settings = null;
-            if (File.Exists(ConfigPath))
+            if (!Directory.Exists(ConfigDirectory)) Directory.CreateDirectory(ConfigDirectory);
+            if (File.Exists(ConfigFile))
             {
-                configText =File.ReadAllText(ConfigPath);
+                configText =File.ReadAllText(ConfigFile);
                 settings = JsonSerializer.Deserialize<ChatAssistantSettings>(configText, serializerOptions);
             }
             if (settings == null)
             {
                 var defaultSettings = GetDefaultSettings();
                 var defaultConfigText = JsonSerializer.Serialize(defaultSettings, serializerOptions);
-                File.WriteAllText(ConfigPath, defaultConfigText);
+                File.WriteAllText(ConfigFile, defaultConfigText);
                 settings = defaultSettings;
             }
             return settings;

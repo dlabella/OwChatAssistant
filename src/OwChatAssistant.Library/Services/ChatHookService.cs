@@ -48,17 +48,19 @@ public sealed class ChatHookService
 
     private void HandleEnter()
     {
-        if (!_chatOpen)
-        {
-            _chatOpen = _cursor.IsCursorVisible();
-        }
+        _chatOpen = _cursor.IsCursorVisible();
+        
         Logger.Log($"Chat Open: {_chatOpen}");
  
-        if (_chatOpen && _buffer.Length>0)
+        if (!_chatOpen && _buffer.Length>0)
         {
             var text = _buffer.ToString();
             var isValid = OnChatMessage(text);
-            if (!isValid) SendKeys.SendWait("{ESC}");
+            if (!isValid) 
+            {
+                Logger.Log("Sending ESC to close chat");
+                SendKeys.SendWait("{ESC}");
+            }
             _chatOpen = !isValid;
         }
         _buffer.Clear();

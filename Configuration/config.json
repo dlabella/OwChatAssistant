@@ -1,0 +1,25 @@
+{
+    "Keyboard": {
+        "DisableBloqMayus": true
+    },
+    "Toxicity": {
+        "ToxicWords": {
+            "en": [
+                "troll",
+                "diff"
+            ],
+            "es": [
+                "troll",
+                "diff"
+            ]
+        },
+        "ToxicityBehavior": "Warn"
+    },
+    "Language": {
+        "DefaultLanguage": "en",
+        "Translations": {}
+    },
+    "System": {
+        "DebugMode": false
+    }
+}

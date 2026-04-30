@@ -55,13 +55,10 @@ TemporaryDependencyNodeTargetIdentifier=net10.0-windows
 
 [sourceFiles]
 Exceptions/ProgramException.cs
-Extensions/StringExtensions.cs
-Interfaces/IOverlayForm.cs
-Logger.cs
-Models/
- Configuration.cs
- ToxicWords.cs
- Translations.cs
+Interfaces/
+ ICursorDetector.cs
+ IKeyboardHookService.cs
+ IOverlayForm.cs
 obj/Debug/net10.0-windows/
  .NETCoreApp,Version=v10.0.AssemblyAttributes.cs
  OwChatAssistant.Library.AssemblyInfo.cs
@@ -69,13 +66,18 @@ obj/Debug/net10.0-windows/
 Overlays/OverlayForm.cs
 Services/
  ChatAssistantService.cs
+ ChatHookService.cs
  CursorDetector.cs
- CursorProcessDetector.cs
- KeyboardHookService.cs
  ToxicityAnalyzerService.cs
+ ToxicWordsService.cs
+ TranslationService.cs
  TrayIconService.cs
+ WindowsKeyboardHookService.cs
 
 [metadataReferences]
+../
+ OwChatAssistant.Common/obj/Debug/net10.0/ref/OwChatAssistant.Common.dll
+ OwChatAssistant.Configuration/obj/Debug/net10.0/ref/OwChatAssistant.Configuration.dll
 <DOTNET>/packs/Microsoft.NETCore.App.Ref/10.0.3/ref/net10.0/
  Microsoft.CSharp.dll
  Microsoft.VisualBasic.Core.dll
