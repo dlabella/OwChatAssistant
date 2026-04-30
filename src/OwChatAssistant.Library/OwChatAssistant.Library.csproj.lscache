@@ -72,7 +72,6 @@ Services/
  CursorDetector.cs
  CursorProcessDetector.cs
  KeyboardHookService.cs
- ProcessWatcher.cs
  ToxicityAnalyzerService.cs
  TrayIconService.cs
 

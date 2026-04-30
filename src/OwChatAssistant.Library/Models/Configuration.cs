@@ -14,11 +14,16 @@ namespace OwChatAssistant.Library.Models
         public Dictionary<string, Dictionary<string, string>> Translations { get; set; } = [];
 
         public Dictionary<string, List<string>> ToxicWords { get; set; } = [];
+        public Utils Utils { get; set; } = new Utils();
     }
     public enum ToxicityBehavior
     {
         Block,
         Warn,
         BlockSilent
+    }
+    public class Utils 
+    {
+        public bool DisableBloqMayus { get; set; } = true;
     }
 }

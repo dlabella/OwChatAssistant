@@ -87,5 +87,8 @@
       "troll",
       "diff"
     ]
+  },
+  "utils": {
+    "disableBloqMayus": true
   }
 }

@@ -14,6 +14,7 @@ public static class KeyboardHookService
     private static IntPtr _hookID = IntPtr.Zero;
 
     public static Func<string, bool> OnChatMessage { get; set; } = (x) => true;
+    public static bool DisableBloqMayus { get; set; } = true;
     public static void Start()
     {
         _hookID = SetHook(_proc);
@@ -53,7 +54,10 @@ public static class KeyboardHookService
 
         int vkCode = Marshal.ReadInt32(lParam);
         Keys key = (Keys)vkCode;
-
+        if (key == Keys.Capital && DisableBloqMayus)
+        {
+            return (IntPtr)1;
+        }
         if (key == Keys.Enter)
         {
             Logger.Log("Enter key pressed. Chat open: " + chatOpen);

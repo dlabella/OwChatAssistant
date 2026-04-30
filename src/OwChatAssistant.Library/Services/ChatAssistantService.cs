@@ -11,7 +11,6 @@ namespace OwChatAssistant.Library.Services
         private readonly Translations translations;
         private readonly ToxicityAnalyzerService toxicityAnalyzerService;
         private readonly IOverlayForm overlay;
-        private readonly ProcessWatcher? serviceWatcher;
         private readonly Configuration? config;
         public ChatAssistantService(IOverlayForm overlay)
         {
@@ -35,9 +34,8 @@ namespace OwChatAssistant.Library.Services
             }
             translations = new Translations(config);
             toxicityAnalyzerService = new ToxicityAnalyzerService(new ToxicWords(config));
+            KeyboardHookService.DisableBloqMayus = config.DisableBloqMayus;
             AttachEvents();
-            //serviceWatcher = new ProcessWatcher();
-
         }
 
         public void Start()
@@ -70,7 +68,7 @@ namespace OwChatAssistant.Library.Services
                         overlay.ShowToast(translations.GetTranslation("ToxicMessage"), MessageType.Warning);
                         break;
                     case ToxicityBehavior.Block:
-                        overlay.ShowToast(translations.GetTranslation("MessageBlocked"), MessageType.Error);
+                        overlay.ShowToast(translations.GetTranslation("MessageBlocked"), MessageType.Warning);
                         break;
                     
                     case ToxicityBehavior.BlockSilent:
