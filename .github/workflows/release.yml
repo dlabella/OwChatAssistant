@@ -27,8 +27,8 @@ jobs:
     - name: Build
       run: dotnet build --configuration Release --no-restore
     
-    - name: Publish (Self-contained)
-      run: dotnet publish --configuration Release --output ./publish --self-contained -r win-x64 -p:PublishSingleFile=true
+    - name: Publish (Solo el proyecto ejecutable)
+      run: dotnet publish ./src/OwChatAssistant/OwChatAssistant.csproj --configuration Release --output ./publish --self-contained -r win-x64 -p:PublishSingleFile=true
     
     - name: Create ZIP archive
       run: |
@@ -46,7 +46,10 @@ jobs:
         body: |
           ## OwChatAssistant ${{ steps.version.outputs.VERSION }}
           
-          **Descarga y ejecuta el .exe**
+          **Descarga y ejecuta**
+          
+          1. Extrae el `.zip`
+          2. Ejecuta `OwChatAssistant.exe`
           
           Compilado automáticamente con GitHub Actions (.NET 10)
       env:
