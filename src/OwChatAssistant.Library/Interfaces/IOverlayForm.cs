@@ -4,6 +4,6 @@
     {
         MessageType Style { get; set; }
 
-        void ShowToast(string text, MessageType type = MessageType.Info);
+        Task ShowToast(string text, MessageType type = MessageType.Info);
     }
 }

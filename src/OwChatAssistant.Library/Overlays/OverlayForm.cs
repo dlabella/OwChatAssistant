@@ -3,25 +3,38 @@ using System.ComponentModel;
 using System.Drawing.Drawing2D;
 
 namespace OwChatAssistant.Library;
-public enum MessageType
-{
-    Info,
-    Success,
-    Warning,
-    Error
-}
+
+public enum MessageType { Info, Success, Warning, Error }
 
 public class OverlayForm : Form, IOverlayForm
 {
-    private string message = "";
-    private bool visible = false;
-    private bool chatDetected = false;
-    private readonly System.Windows.Forms.Timer fadeTimer;
-    private float targetOpacity = 0f;
-    private const float fadeStep = 0.06f;
+    #region Constants
 
-    private float glowPulse = 0f;
-    private bool glowIncreasing = true;
+    private const float FadeStep = 0.06f;
+    private const float GlowStep = 0.02f;
+    private const int TimerInterval = 15;
+    private const int ToastDelay = 2500;
+    private const int ToastPadX = 60;
+    private const int ToastPadY = 30;
+    private const int ToastOffsetX = 40;
+    private const int ToastOffsetY = 140;
+    private const int ChamferCut = 10;
+    private const int FontSize = 18;
+
+    #endregion
+
+    #region Fields
+
+    private string _message = string.Empty;
+    private bool _visible = false;
+    private float _targetOpacity = 0f;
+    private float _glowPulse = 0f;
+    private bool _glowIncreasing = true;
+    private CancellationTokenSource? _toastCts;
+
+    private readonly System.Windows.Forms.Timer _fadeTimer;
+    private readonly Font font = new("Segoe UI Semibold", FontSize);
+    #endregion
 
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public MessageType Style { get; set; } = MessageType.Info;
@@ -31,18 +44,14 @@ public class OverlayForm : Form, IOverlayForm
         FormBorderStyle = FormBorderStyle.None;
         TopMost = true;
         ShowInTaskbar = false;
-
         BackColor = Color.LimeGreen;
         TransparencyKey = Color.LimeGreen;
-
         WindowState = FormWindowState.Maximized;
         Opacity = 0;
-
         DoubleBuffered = true;
 
-        fadeTimer = new System.Windows.Forms.Timer();
-        fadeTimer.Interval = 15;
-        fadeTimer.Tick += FadeTick;
+        _fadeTimer = new System.Windows.Forms.Timer { Interval = TimerInterval };
+        _fadeTimer.Tick += FadeTick;
     }
 
     // Click-through overlay
@@ -51,123 +60,122 @@ public class OverlayForm : Form, IOverlayForm
         get
         {
             var cp = base.CreateParams;
-            cp.ExStyle |= 0x80000;
-            cp.ExStyle |= 0x20;
+            cp.ExStyle |= 0x80000 | 0x20;
             return cp;
         }
     }
 
-    // API pública
-    public void SetChatDetected(bool detected)
+    public async Task ShowToast(string text, MessageType type = MessageType.Info)
     {
-        chatDetected = detected;
-        Invalidate();
-    }
-    public async void ShowToast(string text, MessageType type = MessageType.Info)
-    {
-        
-        message = text;
+        if (_toastCts != null && !_toastCts.IsCancellationRequested)
+        {
+            await _toastCts.CancelAsync();
+        }
+        _toastCts = new CancellationTokenSource();
+        var token = _toastCts.Token;
+
+        _message = text;
         Style = type;
-        visible = true;
+        _visible = true;
 
-        targetOpacity = 1f;
-        fadeTimer.Start();
+        SetTargetOpacity(1f);
 
-        await Task.Delay(2500);
-
-        targetOpacity = 0f;
-        fadeTimer.Start();
+        try
+        {
+            await Task.Delay(ToastDelay, token);
+            SetTargetOpacity(0f);
+        }
+        catch (TaskCanceledException)
+        {
+            // Expected when toast is cancelled by a new ShowToast call
+        }
     }
 
-    // Animación fade + glow
+    private void SetTargetOpacity(float target)
+    {
+        _targetOpacity = target;
+        _fadeTimer.Start();
+    }
+
     private void FadeTick(object? sender, EventArgs e)
     {
-        // fade
-        if (targetOpacity > Opacity)
-        {
-            Opacity += fadeStep;
-            if (Opacity >= targetOpacity)
-                Opacity = targetOpacity;
-        }
-        else
-        {
-            Opacity -= fadeStep;
-            if (Opacity <= targetOpacity)
-            {
-                Opacity = targetOpacity;
+        UpdateOpacity();
+        UpdateGlowPulse();
 
-                if (Opacity <= 0)
-                    visible = false;
-            }
-        }
-
-        // glow pulse
-        if (glowIncreasing)
+        if (Opacity <= 0 && _targetOpacity == 0)
         {
-            glowPulse += 0.02f;
-            if (glowPulse >= 1f) glowIncreasing = false;
+            _fadeTimer.Stop();
+            _visible = false;
         }
-        else
-        {
-            glowPulse -= 0.02f;
-            if (glowPulse <= 0f) glowIncreasing = true;
-        }
-
-        if (Opacity <= 0 && targetOpacity == 0)
-            fadeTimer.Stop();
 
         Invalidate();
     }
 
-    // Render HUD
+    private void UpdateOpacity()
+    {
+        if (_targetOpacity > Opacity)
+            Opacity = Math.Min(Opacity + FadeStep, _targetOpacity);
+        else
+            Opacity = Math.Max(Opacity - FadeStep, _targetOpacity);
+    }
+
+    private void UpdateGlowPulse()
+    {
+        _glowPulse += _glowIncreasing ? GlowStep : -GlowStep;
+
+        if (_glowPulse >= 1f) { _glowPulse = 1f; _glowIncreasing = false; }
+        else if (_glowPulse <= 0f) { _glowPulse = 0f; _glowIncreasing = true; }
+    }
+
     protected override void OnPaint(PaintEventArgs e)
     {
         base.OnPaint(e);
 
-        if (!visible && Opacity <= 0)
-            return;
+        if (!_visible && Opacity <= 0) return;
 
         var g = e.Graphics;
         g.SmoothingMode = SmoothingMode.AntiAlias;
 
-        using var font = new Font("Segoe UI Semibold", 18);
-
-        SizeF textSize = g.MeasureString(message, font);
-
-        float x = 40;
-        float y = Height - 140;
-
-        Rectangle rect = new Rectangle(
-            (int)x,
-            (int)y,
-            (int)textSize.Width + 60,
-            (int)textSize.Height + 30
+        var textSize = g.MeasureString(_message, font);
+        var rect = new Rectangle(
+            ToastOffsetX,
+            Height - ToastOffsetY,
+            (int)textSize.Width + ToastPadX,
+            (int)textSize.Height + ToastPadY
         );
 
-        using (var brush = new LinearGradientBrush(
+        DrawToastBackground(g, rect);
+        DrawToastBorder(g, rect);
+        DrawToastText(g, rect, font, textSize);
+    }
+
+    private static void DrawToastBackground(Graphics g, Rectangle rect)
+    {
+        using var brush = new LinearGradientBrush(
             rect,
             Color.FromArgb(0xFF, 0x00, 0x71, 0xCD),
             Color.FromArgb(0xFF, 0x00, 0x4F, 0x8F),
-            90f))
-        {
-            FillChamfered(g, brush, rect, 10);
-        }
+            90f);
+        FillChamfered(g, brush, rect, ChamferCut);
+    }
 
-        int glowAlpha = (int)(120 + glowPulse * 100);
+    private void DrawToastBorder(Graphics g, Rectangle rect)
+    {
+        int glowAlpha = (int)(120 + _glowPulse * 100);
+        using var pen = new Pen(Color.FromArgb(glowAlpha, 0, 180, 255), 2);
+        DrawChamfered(g, pen, rect, ChamferCut);
+    }
 
-        using (var pen = new Pen(Color.FromArgb(glowAlpha, 0, 180, 255), 2))
-        {
-            DrawChamfered(g, pen, rect, 10);
-        }
-
-        using var textBrush = new SolidBrush(Color.White);
-
+    private void DrawToastText(Graphics g, Rectangle rect, Font font, SizeF textSize)
+    {
+        using var brush = new SolidBrush(Color.White);
         float textX = rect.X + (rect.Width - textSize.Width) / 2;
         float textY = rect.Y + (rect.Height - textSize.Height) / 2;
-
-        g.DrawString(message, font, textBrush, textX, textY);
+        g.DrawString(_message, font, brush, textX, textY);
     }
-    
+
+    #region Chamfer Helpers
+
     private static void FillChamfered(Graphics g, Brush b, Rectangle r, int cut)
     {
         using var path = ChamferedRect(r, cut);
@@ -180,31 +188,37 @@ public class OverlayForm : Form, IOverlayForm
         g.DrawPath(p, path);
     }
 
-    private static GraphicsPath ChamferedRect(Rectangle bounds, int cut)
+    private static GraphicsPath ChamferedRect(Rectangle b, int cut)
     {
+        int x = b.X, y = b.Y, w = b.Width, h = b.Height;
         var path = new GraphicsPath();
-
-        int x = bounds.X;
-        int y = bounds.Y;
-        int w = bounds.Width;
-        int h = bounds.Height;
-
         path.StartFigure();
-
-        path.AddLine(x + cut, y, x + w - cut, y);
-        path.AddLine(x + w - cut, y, x + w, y + cut);
-
-        path.AddLine(x + w, y + cut, x + w, y + h - cut);
-        path.AddLine(x + w, y + h - cut, x + w - cut, y + h);
-
-        path.AddLine(x + w - cut, y + h, x + cut, y + h);
-        path.AddLine(x + cut, y + h, x, y + h - cut);
-
-        path.AddLine(x, y + h - cut, x, y + cut);
-        path.AddLine(x, y + cut, x + cut, y);
-
+        path.AddLines([
+            new PointF(x + cut,     y),
+            new PointF(x + w - cut, y),
+            new PointF(x + w,       y + cut),
+            new PointF(x + w,       y + h - cut),
+            new PointF(x + w - cut, y + h),
+            new PointF(x + cut,     y + h),
+            new PointF(x,           y + h - cut),
+            new PointF(x,           y + cut),
+            new PointF(x + cut,     y)
+        ]);
         path.CloseFigure();
-
         return path;
+    }
+
+    #endregion
+
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            font.Dispose();
+            _toastCts?.Cancel();
+            _toastCts?.Dispose();
+            _fadeTimer.Dispose();
+        }
+        base.Dispose(disposing);
     }
 }

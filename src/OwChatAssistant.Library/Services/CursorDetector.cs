@@ -1,8 +1,11 @@
+using OwChatAssistant.Library.Interfaces;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 
 namespace OwChatAssistant.Library.Services;
 
-public static class CursorDetector
+[SupportedOSPlatform("windows")]
+public class CursorDetector : ICursorDetector
 {
     private const int CURSOR_SHOWING = 0x00000001;
 
@@ -23,18 +26,11 @@ public static class CursorDetector
     }
 
     [DllImport("user32.dll")]
-    private static extern bool GetCursorInfo(
-        out CursorInfo pci);
+    private static extern bool GetCursorInfo(ref CursorInfo pci);
 
-    public static bool IsCursorVisible()
+    public bool IsCursorVisible()
     {
-        CursorInfo info = new();
-        info.cbSize = Marshal.SizeOf(info);
-        var shown = false;
-        if (GetCursorInfo(out info))
-        {
-            shown = (info.flags & CURSOR_SHOWING) != 1;
-        }
-        return shown;
+        var info = new CursorInfo { cbSize = Marshal.SizeOf<CursorInfo>() };
+        return GetCursorInfo(ref info) && (info.flags & CURSOR_SHOWING) != 0;
     }
 }

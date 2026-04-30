@@ -1,16 +1,21 @@
-﻿using OwChatAssistant.Library.Extensions;
-using OwChatAssistant.Library.Models;
+﻿using OwChatAssistant.Library.Common.Extensions;
 
-namespace OwChatAssistant.Library.Services
+namespace OwChatAssistant.Library.Services;
+
+public class ToxicityAnalyzerService(ToxicWordsService toxicWords)
 {
-    public class ToxicityAnalyzerService(ToxicWords toxicWords)
-    {
-        private readonly IEnumerable<string> words = toxicWords.GetAllWords();
+    private static readonly char[] _separators = [' ', '\n', '\r', '\t', '.', ',', '!', '?', ';', ':', '-', '_', '(', ')', '[', ']', '{', '}', '"', '\''];
 
-        public bool IsToxic(string text)
-        {
-            var textWords = text.RemoveDiacritics().ToLower().Split(new[] { ' ', '\n', '\r', '\t', '.', ',', '!', '?', ';', ':', '-', '_', '(', ')', '[', ']', '{', '}', '"', '\'' }, StringSplitOptions.RemoveEmptyEntries);
-            return words.Any(x => textWords.Contains(x, StringComparer.OrdinalIgnoreCase));
-        }
+    // ToxicWordsService already returns words normalized (lowercased, no diacritics)
+    private readonly HashSet<string> _words = [.. toxicWords.GetAllWords()];
+
+    public bool IsToxic(string text)
+    {
+        if (string.IsNullOrWhiteSpace(text)) return false;
+
+        var normalized = text.RemoveDiacritics().ToLower();
+        var textWords = normalized.Split(_separators, StringSplitOptions.RemoveEmptyEntries);
+
+        return Array.Exists(textWords, w => _words.Contains(w));
     }
 }

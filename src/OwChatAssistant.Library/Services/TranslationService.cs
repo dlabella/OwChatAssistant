@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using OwChatAssistant.Configuration;
 
-namespace OwChatAssistant.Library.Models
+namespace OwChatAssistant.Library.Services
 {
-    public class Translations(Configuration config)
+    public class TranslationService(ChatAssistantSettings config)
     {
-        private readonly string defaultLanguage = config.DefaultLanguage ?? "en";
-        private readonly Dictionary<string, Dictionary<string, string>> translations = config.Translations;
+        private readonly string defaultLanguage = config.Language.DefaultLanguage ?? "en";
+        private readonly Dictionary<string, Dictionary<string, string>> translations = config.Language.Translations;
         public string GetTranslation(string language, string key)
         {
             if (translations.TryGetValue(key, out var langTranslations) &&

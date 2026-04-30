@@ -1,4 +1,4 @@
-﻿namespace OwChatAssistant.Library
+﻿namespace OwChatAssistant.Common
 {
     public static class Logger
     {

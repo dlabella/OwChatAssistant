@@ -1,76 +1,60 @@
-﻿using OwChatAssistant.Library.Exceptions;
+﻿using OwChatAssistant.Common;
+using OwChatAssistant.Configuration;
 using OwChatAssistant.Library.Interfaces;
-using OwChatAssistant.Library.Models;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace OwChatAssistant.Library.Services
 {
     public class ChatAssistantService
     {
-        private readonly Translations translations;
+        private readonly TranslationService translations;
         private readonly ToxicityAnalyzerService toxicityAnalyzerService;
         private readonly IOverlayForm overlay;
-        private readonly Configuration? config;
-        public ChatAssistantService(IOverlayForm overlay)
+        private readonly ChatAssistantSettings? config;
+        private readonly ChatHookService chatHookService;
+
+        public ChatAssistantService(IOverlayForm overlay, IKeyboardHookService keyboard, ICursorDetector cursor)
         {
             this.overlay = overlay;
-            var configText = File.ReadAllText("Configuration/config.json");
-            if (String.IsNullOrEmpty(configText))
+            config = ChatAssistantSettings.Load();
+            translations = new TranslationService(config);
+            toxicityAnalyzerService = new ToxicityAnalyzerService(new ToxicWordsService(config));
+            chatHookService = new ChatHookService(keyboard, cursor, config)
             {
-                throw new ProgramException("Configuration file is empty or missing.");
-            }
-            config = JsonSerializer.Deserialize<Configuration>(configText, new JsonSerializerOptions()
-            {
-                PropertyNameCaseInsensitive = true,
-                Converters =
-                {
-                    new JsonStringEnumConverter()
-                }
-            });
-            if (config == null)
-            {
-                throw new ProgramException("Invalid configuration file format.");
-            }
-            translations = new Translations(config);
-            toxicityAnalyzerService = new ToxicityAnalyzerService(new ToxicWords(config));
-            KeyboardHookService.DisableBloqMayus = config.DisableBloqMayus;
-            AttachEvents();
+                OnChatMessage = AnalyzeChatMessage
+            };
         }
 
         public void Start()
         {
-            KeyboardHookService.Start();
+            chatHookService.Start();
             overlay.ShowToast(translations.GetTranslation("ServiceStarted"), MessageType.Info);
+            Logger.Log("Chat Assistant Service started.");
         }
 
         public void Stop()
         {
-            KeyboardHookService.Stop();
+            chatHookService.Stop();
             overlay.ShowToast(translations.GetTranslation("ServiceStopped"), MessageType.Info);
-        }
-
-        private void AttachEvents()
-        {
-            KeyboardHookService.OnChatMessage = AnalyzeChatMessage;
+            Logger.Log("Chat Assistant Service stopped.");
         }
 
         private bool AnalyzeChatMessage(string message)
         {
+            Logger.Log($"Chat message: {message}");
             var isToxic = toxicityAnalyzerService.IsToxic(message);
             if (isToxic)
             {
-                Logger.Log("Blocked toxic message: " + message);
-                switch (config?.ToxicityBehavior)
+                Logger.Log("Blocked toxic message");
+                switch (config?.Toxicity.ToxicityBehavior)
                 {
                     case ToxicityBehavior.Warn:
-                        isToxic=false;
+                        isToxic = false;
                         overlay.ShowToast(translations.GetTranslation("ToxicMessage"), MessageType.Warning);
                         break;
                     case ToxicityBehavior.Block:
                         overlay.ShowToast(translations.GetTranslation("MessageBlocked"), MessageType.Warning);
                         break;
-                    
+
                     case ToxicityBehavior.BlockSilent:
                         break;
                 }
@@ -79,3 +63,4 @@ namespace OwChatAssistant.Library.Services
         }
     }
 }
+

@@ -1,7 +1,7 @@
 using System.Globalization;
 using System.Text;
 
-namespace OwChatAssistant.Library.Extensions
+namespace OwChatAssistant.Library.Common.Extensions
 {
     public static class StringExtensions
     {
